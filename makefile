@@ -5,7 +5,7 @@ TESTBENCHFILE = $(TESTBENCH)_tb
 #GHDL config
 GHDL=ghdl
 GHDLFLAGS= --std=08 --workdir=$(WORKDIR)
-GHDLRUNFLAGS= --vcd=alu.vcd
+GHDLRUNFLAGS=
 
 WORKDIR = work
 SIMDIR = sim
@@ -13,17 +13,24 @@ WAVEFORM_VIEWER = gtkwave
 
 MODULES=\
 	alu32.vhdl \
-	alu32_tb.vhdl
+	alu32_tb.vhdl \
+	registers.vhdl \
+	registers_tb.vhdl
 
 .PHONY: clean
 
-all : clean
+all : clean alu_wave reg_file_wave
 
 alu_wave: alu_tb
-	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS)
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
 
-# Binary depends on the object file
 alu_tb: init
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+reg_file_wave: reg_file_tb
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+
+reg_file_tb: init
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 # Object file depends on source
