@@ -50,39 +50,39 @@ architecture Behavioral of REG_FILE is
 begin
 
     -- Write values to registers
-    process( DATAIN1, DATAIN2, R1_SEL , R2_SEL, WE1, WE2,
-            FIN, WF, SPIN, WSP, CLK, nRST)
-    begin
-        if nRST = '0' then
+  process( DATAIN1, DATAIN2, R1_SEL , R2_SEL, WE1, WE2,
+    FIN, WF, SPIN, WSP, CLK, nRST)
+  begin
+    if nRST = '0' then
             -- RESET
-            for i in 0 to 15 loop
-                registers(i) <=  (others => '0');
-            end loop;
+      for i in 0 to 15 loop
+        registers(i) <=  (others => '0');
+      end loop;
 
-        elsif WF = '1' AND rising_EDGE (CLK) then
+    elsif WF = '1' AND rising_EDGE (CLK) then
             -- Overwrite Flag register
-            registers(FLAGS) <= FIN;
+      registers(FLAGS) <= FIN;
 
-        elsif WSP = '1' AND rising_EDGE (CLK) then
+    elsif WSP = '1' AND rising_EDGE (CLK) then
             -- Overwrite Stack register
-            registers(SP) <= FIN;
+      registers(SP) <= FIN;
 
-        elsif WE1 = '1' AND rising_EDGE (CLK) then
-            registers(to_integer(R1_SEL)) <= DATAIN1;
+    elsif WE1 = '1' AND rising_EDGE (CLK) then
+      registers(to_integer(R1_SEL)) <= DATAIN1;
 
-        elsif WE2 = '1' AND rising_EDGE (CLK) then
-            registers(to_integer(R2_SEL)) <= DATAIN2;
-        end if;
-    end process;
+    elsif WE2 = '1' AND rising_EDGE (CLK) then
+      registers(to_integer(R2_SEL)) <= DATAIN2;
+    end if;
+  end process;
 
     -- Update outs
-    R1OUT <= registers(to_integer(R1_SEL));
-    R2OUT <= registers(to_integer(R2_SEL));
-    R3OUT <= registers(to_integer(R3_SEL));
+  R1OUT <= registers(to_integer(R1_SEL));
+  R2OUT <= registers(to_integer(R2_SEL));
+  R3OUT <= registers(to_integer(R3_SEL));
 
-    FOUT <= registers(FLAGS);
-    IAOUT <= registers(IA);
-    SPOUT <= registers(SP);
+  FOUT <= registers(FLAGS);
+  IAOUT <= registers(IA);
+  SPOUT <= registers(SP);
 
 end Behavioral;
 
