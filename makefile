@@ -15,11 +15,15 @@ MODULES=\
 	alu32.vhdl \
 	alu32_tb.vhdl \
 	registers.vhdl \
-	registers_tb.vhdl
+	registers_tb.vhdl \
+	toy_cpu.vhdl \
+	toy_cpu_tb.vhdl \
+	i_memory.vhdl
+
 
 .PHONY: clean
 
-all : clean alu_wave reg_file_wave
+all : clean alu_wave reg_file_wave toy_cpu_wave
 
 alu_wave: alu_tb
 	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
@@ -31,6 +35,12 @@ reg_file_wave: reg_file_tb
 	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
 
 reg_file_tb: init
+	$(GHDL) -e $(GHDLFLAGS) $@
+
+toy_cpu_wave: toy_cpu_tb
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+
+toy_cpu_tb: init
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 # Object file depends on source
