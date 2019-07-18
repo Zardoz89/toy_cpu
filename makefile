@@ -12,6 +12,8 @@ SIMDIR = sim
 WAVEFORM_VIEWER = gtkwave
 
 MODULES=\
+	umul.vhdl \
+	umul_tb.vhdl \
 	alu32.vhdl \
 	alu32_tb.vhdl \
 	registers.vhdl \
@@ -23,7 +25,13 @@ MODULES=\
 
 .PHONY: clean
 
-all : clean alu_wave reg_file_wave toy_cpu_wave
+all : clean umul_wave alu_wave reg_file_wave toy_cpu_wave
+
+umul_wave: umul_tb
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+
+umul_tb: init
+	$(GHDL) -e $(GHDLFLAGS) $@
 
 alu_wave: alu_tb
 	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
