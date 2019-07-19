@@ -59,50 +59,104 @@ begin
     start <= '1';
     wait for CLK_PERIOD;
     start <= '0';
+    assert finish = '0'
+        report "finish signal isn't togle to false before finishing calculation"
+        severity failure;
 
-    wait for CLK_PERIOD*34;
+    wait until finish'event AND finish ='1'; --for CLK_PERIOD*34;
 
     assert output_lsb = x"0000_0000" AND output_msb = x"0000_0000"
         report "0x0 must be 0 !"
         severity failure;
 
     -- Test 1x1 == 1
+    wait for CLK_PERIOD;
     opa <= X"0000_0001";
     opb <= X"0000_0001";
     start <= '1';
     wait for CLK_PERIOD;
     start <= '0';
 
-    wait for CLK_PERIOD*34;
+    assert finish = '0'
+        report "finish signal isn't togle to false before finishing calculation"
+        severity failure;
+
+    wait until finish'event AND finish ='1';
 
     assert output_lsb = x"0000_0001" AND output_msb = x"0000_0000"
         report "1x1 must be 1 !"
         severity failure;
 
     -- Test BEBA_CAFEx1 == BEBA_CAFE
+    wait for CLK_PERIOD;
     opa <= X"BEBA_CAFE";
     opb <= X"0000_0001";
     start <= '1';
     wait for CLK_PERIOD;
     start <= '0';
 
-    wait for CLK_PERIOD*34;
+    assert finish = '0'
+        report "finish signal isn't togle to false before finishing calculation"
+        severity failure;
+
+    wait until finish'event AND finish ='1';
 
     assert output_lsb = x"BEBA_CAFE" AND output_msb = x"0000_0000"
         report "BEBACAFEx1 must be BEBACAFE !"
         severity failure;
 
     -- Test 1xBEBA_CAFE == BEBA_CAFE
+    wait for CLK_PERIOD;
     opa <= X"0000_0001";
     opb <= X"BEBA_CAFE";
     start <= '1';
     wait for CLK_PERIOD;
     start <= '0';
 
-    wait for CLK_PERIOD*34;
+    assert finish = '0'
+        report "finish signal isn't togle to false before finishing calculation"
+        severity failure;
+
+    wait until finish'event AND finish ='1';
 
     assert output_lsb = x"BEBA_CAFE" AND output_msb = x"0000_0000"
         report "1xBEBACAFE must be BEBACAFE !"
+        severity failure;
+
+    -- Test 27BE_10A5xBEBA_CAFE == 1D9C_0FF5_F598_B5B6
+    wait for CLK_PERIOD;
+    opa <= X"27BE_10A5";
+    opb <= X"BEBA_CAFE";
+    start <= '1';
+    wait for CLK_PERIOD;
+    start <= '0';
+
+    assert finish = '0'
+        report "finish signal isn't togle to false before finishing calculation"
+        severity failure;
+
+    wait until finish'event AND finish ='1';
+
+    assert output_lsb = x"F598_B5B6" AND output_msb = x"1D9C_0FF5"
+        report "27BE_10A5xBEBA_CAFE must be 1D9C_0FF5_F598_B5B6 !"
+        severity failure;
+
+    -- Test BEBA_CAFEx27BE_10A5 == 1D9C_0FF5_F598_B5B6
+    wait for CLK_PERIOD;
+    opa <= X"BEBA_CAFE";
+    opb <= X"27BE_10A5";
+    start <= '1';
+    wait for CLK_PERIOD;
+    start <= '0';
+
+    assert finish = '0'
+        report "finish signal isn't togle to false before finishing calculation"
+        severity failure;
+
+    wait until finish'event AND finish ='1';
+
+    assert output_lsb = x"F598_B5B6" AND output_msb = x"1D9C_0FF5"
+        report "BEBA_CAGEx27BE_10A5 must be 1D9C_0FF5_F598_B5B6 !"
         severity failure;
 
     end_simulation <= true;

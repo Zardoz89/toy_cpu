@@ -23,7 +23,7 @@ end umul;
 architecture umul_arch of umul is
 
   signal enabled : std_logic;
-  signal multiplicand : std_logic_vector(31 downto 0);
+  signal multiplicand : std_logic_vector(63 downto 0);
   signal multiplier : std_logic_vector(63 downto 0);
   signal acumulator : std_logic_vector(63 downto 0);
 begin
@@ -35,7 +35,7 @@ begin
       if (start = '1' AND enabled /= '1') then
         -- re-start multiplication
         enabled <= '1';
-        multiplicand <= opa;
+        multiplicand <= X"0000_0000" & opa;
         multiplier <= X"0000_0000" & opb;
         acumulator <= X"0000_0000_0000_0000";
         finish <= '0';
@@ -48,7 +48,7 @@ begin
             acumulator <= acumulator + multiplicand;
           end if;
           -- shift multiplicand and multipler
-          multiplicand <= multiplicand(30 downto 0) & '0';
+          multiplicand <= multiplicand(62 downto 0) & '0';
           multiplier <= '0' & multiplier(63 downto 1);
           counter := counter + 1;
         else
