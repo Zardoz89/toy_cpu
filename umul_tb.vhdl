@@ -25,6 +25,9 @@ architecture BEHAVIORAL of UMUL_TB is
   -- DUT component
 
   component UMUL is
+    generic (
+      BITS : integer
+    );
     port (
       CLK        : in    std_logic;
       START      : in    std_logic;
@@ -36,12 +39,15 @@ architecture BEHAVIORAL of UMUL_TB is
     );
   end component;
 
-  constant clk_period : time := 10 ns;
+  constant clk_period : time := 100 ns; -- 10Mhz
 
 begin
 
   -- Connect DUT
   UUT : UMUL
+    generic map (
+      BITS => 32
+  )
     port map (clk, start, opa, opb, output_lsb, output_msb, finish);
 
   CLK_PROCESS : process
@@ -187,6 +193,7 @@ begin
       severity failure;
 
     -- Finish test
+    wait for clk_period;
     end_simulation <= true;
     assert false
       report "Test done. Open EPWave to see signals."
