@@ -8,37 +8,44 @@ library IEEE;
   use IEEE.NUMERIC_STD_UNSIGNED.all;
 
 -- unsigned multiplicator entity
-entity umul is
-  port(
-    clk : in std_logic;
-    start : in std_logic;
-    opa : in std_logic_vector(31 downto 0);
-    opb : in std_logic_vector(31 downto 0);
-    output_lsb : out std_logic_vector(31 downto 0);
-    output_msb : out std_logic_vector(31 downto 0);
-    finish : out std_logic);
-end umul;
+
+entity UMUL is
+  port (
+    CLK        : in    std_logic;
+    START      : in    std_logic;
+    OPA        : in    std_logic_vector(31 downto 0);
+    OPB        : in    std_logic_vector(31 downto 0);
+    OUTPUT_LSB : out   std_logic_vector(31 downto 0);
+    OUTPUT_MSB : out   std_logic_vector(31 downto 0);
+    FINISH     : out   std_logic
+  );
+end entity UMUL;
 
 -- unsigned multiplicator architecture
-architecture umul_arch of umul is
 
-  signal enabled : std_logic;
+architecture UMUL_ARCH of UMUL is
+
+  signal enabled      : std_logic;
   signal multiplicand : std_logic_vector(63 downto 0);
-  signal multiplier : std_logic_vector(63 downto 0);
-  signal acumulator : std_logic_vector(63 downto 0);
+  signal multiplier   : std_logic_vector(63 downto 0);
+  signal acumulator   : std_logic_vector(63 downto 0);
+
 begin
 
-  Multiplicator: process (start, clk)
-  variable counter : integer range 0 to 32;
+  MULTIPLICATOR : process (start, clk) is
+
+    variable counter : integer range 0 to 32;
+
   begin
-    if rising_edge(clk) then
+
+    if (clk'event and clk = '1') then
       if (start = '1' AND enabled /= '1') then
         -- re-start multiplication
-        enabled <= '1';
+        enabled      <= '1';
         multiplicand <= X"0000_0000" & opa;
-        multiplier <= X"0000_0000" & opb;
-        acumulator <= X"0000_0000_0000_0000";
-        finish <= '0';
+        multiplier   <= X"0000_0000" & opb;
+        acumulator   <= X"0000_0000_0000_0000";
+        finish       <= '0';
         counter := 0;
       elsif (enabled = '1') then
         -- do a step
@@ -49,18 +56,19 @@ begin
           end if;
           -- shift multiplicand and multipler
           multiplicand <= multiplicand(62 downto 0) & '0';
-          multiplier <= '0' & multiplier(63 downto 1);
+          multiplier   <= '0' & multiplier(63 downto 1);
           counter := counter + 1;
         else
           -- finish
-          enabled <= '0';
-          finish <= '1';
+          enabled    <= '0';
+          finish     <= '1';
           output_lsb <= acumulator(31 downto 0);
           output_msb <= acumulator(63 downto 32);
         end if;
       end if;
     end if;
-  end process;
 
-end umul_arch;
+  end process MULTIPLICATOR;
+
+end architecture UMUL_ARCH;
 

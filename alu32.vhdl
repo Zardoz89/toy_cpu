@@ -2,122 +2,133 @@
 -- Created by Luis Panadero Guardeño
 -- MIT License
 
-LIBRARY ieee;
-    USE ieee.std_logic_1164.all;
-    USE ieee.numeric_std.all;
-    USE ieee.numeric_std_unsigned.all;
+library ieee;
+  use ieee.std_logic_1164.all;
+  use ieee.numeric_std.all;
+  use ieee.numeric_std_unsigned.all;
 
 -- ALU entity
-ENTITY ALU IS
-  PORT(
-       OPA : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-       OPB : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-       OPERATION: IN STD_LOGIC_VECTOR(3 DOWNTO 0);
-       CARRYIN: IN STD_LOGIC;    -- Old carry
-       OUTPUT : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
-       CARRYOUT : OUT STD_LOGIC; -- Carry
-       OV : OUt STD_LOGIC;       -- Overflow 32 bit
-       OVW : OUT STD_LOGIC;      -- Overflow 16 bit
-       OVB : OUT STD_LOGIC;      -- Overflow 8 bit
-       Z : OUT STD_LOGIC;        -- Zero
-       N : OUT STD_LOGIC);       -- Negative
-END ALU;
+
+entity ALU is
+  port (
+    OPA       : in    std_logic_vector(31 DOWNTO 0);
+    OPB       : in    std_logic_vector(31 DOWNTO 0);
+    OPERATION : in    std_logic_vector(3 DOWNTO 0);
+    CARRYIN   : in    STD_LOGIC;        -- Old carry
+    OUTPUT    : out   std_logic_vector(31 DOWNTO 0);
+    CARRYOUT  : out   STD_LOGIC;        -- Carry
+    OV        : out   STD_LOGIC;        -- Overflow 32 bit
+    OVW       : out   STD_LOGIC;        -- Overflow 16 bit
+    OVB       : out   STD_LOGIC;        -- Overflow 8 bit
+    Z         : out   STD_LOGIC;        -- Zero
+    N         : out   std_logic         -- Negative
+  );
+end entity ALU;
 
 -- ALU architecture
-ARCHITECTURE Behavioral OF ALU IS
 
--- We use one extra bit to get free the carry bit
-signal RESULT: STD_LOGIC_VECTOR(32 DOWNTO 0);
+architecture BEHAVIORAL of ALU is
 
+  -- We use one extra bit to get free the carry bit
+  signal result : std_logic_vector(32 DOWNTO 0);
 
-BEGIN
+begin
 
-  PROCESS(OPA, OPB, OPERATION)
-    variable shift : INTEGER;
-  BEGIN
+  process (OPA, OPB, OPERATION) is
 
+    variable shift : integer;
+
+  begin
 
     case OPERATION is
-      when x"0" => -- AND
-          RESULT <= ('0' & OPA) and ('0' & OPB);
-      when x"1" => -- OR
-        RESULT <= ('0' & OPA) or ('0' & OPB);
-      when x"2" => -- XOR
-        RESULT <= ('0' & OPA) xor ('0' & OPB);
-      when x"3" => -- BITC (and NOT OPB if OPA is full of 1's)
-        RESULT <= ('0' & OPA) and ('0' & not OPB);
-      when x"4" => -- ADD
-        RESULT <= ('0' & OPA) + ('0' & OPB);
-      when x"5" => -- ADDC
-        RESULT <= ('0' & OPA) + ('0' & OPB) + CARRYIN;
-      when x"6" => -- SUB
-        RESULT <= ('0' & OPA) + ('1' & not OPB) + '1';
-      when x"7" => -- SUBB
-        RESULT <= ('0' & OPA) + not (('0' & OPB) + CARRYIN) + '1';
-      when x"8" => -- RSB
-        RESULT <= ('0' & OPB) + ('1' & not OPA) + '1';
-      when x"9" => -- RSBB
-        RESULT <= ('0' & OPB) + not (('0' & OPA) + CARRYIN) + '1';
 
-      when x"A" => -- LLS
+      when x"0" =>          -- AND
+        result <= ('0' & OPA) and ('0' & OPB);
+      when x"1" =>          -- OR
+        result <= ('0' & OPA) or ('0' & OPB);
+      when x"2" =>          -- XOR
+        result <= ('0' & OPA) xor ('0' & OPB);
+      when x"3" =>          -- BITC (and NOT OPB if OPA is full of 1's)
+        result <= ('0' & OPA) and ('0' & not OPB);
+      when x"4" =>          -- ADD
+        result <= ('0' & OPA) + ('0' & OPB);
+      when x"5" =>          -- ADDC
+        result <= ('0' & OPA) + ('0' & OPB) + CARRYIN;
+      when x"6" =>          -- SUB
+        result <= ('0' & OPA) + ('1' & not OPB) + '1';
+      when x"7" =>          -- SUBB
+        result <= ('0' & OPA) + not (('0' & OPB) + CARRYIN) + '1';
+      when x"8" =>          -- RSB
+        result <= ('0' & OPB) + ('1' & not OPA) + '1';
+      when x"9" =>          -- RSBB
+        result <= ('0' & OPB) + not (('0' & OPA) + CARRYIN) + '1';
+
+      when x"A" =>          -- LLS
         shift := to_integer(OPB(4 downto 0));
-        RESULT(31 downto 0) <=  OPA(31-shift downto 0) & (shift-1 downto 0 => '0');
+        result(31 downto 0) <= OPA(31 - shift downto 0) & (shift - 1 downto 0 => '0');
+
         if (shift > 0) then -- Sets carry bit
-          RESULT(32) <= OPA(31-shift+1);
+          result(32) <= OPA(31 - shift + 1);
         else
-          RESULT(32) <= '0';
+          result(32) <= '0';
         end if;
 
-      when x"B" => -- LRS
+      when x"B" =>          -- LRS
         shift := to_integer(OPB(4 downto 0));
-        RESULT(31 downto 0) <= (31 downto (32-shift) => '0') & OPA(31 downto shift);
+        result(31 downto 0) <= (31 downto (32 - shift) => '0') & OPA(31 downto shift);
+
         if (shift > 0) then -- Sets carry bit
-          RESULT(32) <= OPA(shift-1);
+          result(32) <= OPA(shift - 1);
         else
-          RESULT(32) <= '0';
+          result(32) <= '0';
         end if;
 
-      when x"C" => -- ARS
+      when x"C" =>          -- ARS
         shift := to_integer(OPB(4 downto 0));
-        RESULT(31 downto 0) <= (31 downto (32-shift) => OPA(31)) & OPA(31 downto shift);
+        result(31 downto 0) <= (31 downto (32 - shift) => OPA(31)) & OPA(31 downto shift);
+
         if (shift > 0) then -- Sets carry bit
-          RESULT(32) <= OPA(shift-1);
+          result(32) <= OPA(shift - 1);
         else
-          RESULT(32) <= '0';
+          result(32) <= '0';
         end if;
 
-      when x"D" => -- ROTL
-        RESULT(32) <= '0';
+      when x"D" =>          -- ROTL
+        result(32) <= '0';
         shift := to_integer(OPB(4 downto 0));
+
         if (shift > 0) then
-          RESULT(31 downto 0) <= OPA(31-shift downto 0) & OPA(31 downto 32-shift);
+          result(31 downto 0) <= OPA(31 - shift downto 0) & OPA(31 downto 32 - shift);
         else
-          RESULT(31 downto 0) <= OPA;
+          result(31 downto 0) <= OPA;
         end if;
 
-      when x"E" => -- ROTR
-        RESULT(32) <= '0';
+      when x"E" =>          -- ROTR
+        result(32) <= '0';
         shift := to_integer(OPB(4 downto 0));
+
         if (shift > 0) then
-          RESULT(31 downto 0) <= OPA(shift-1 downto 0) & OPA(31 downto shift);
+          result(31 downto 0) <= OPA(shift - 1 downto 0) & OPA(31 downto shift);
         else
-          RESULT(31 downto 0) <= OPA;
+          result(31 downto 0) <= OPA;
         end if;
 
       when others =>
-        RESULT <= (32 downto 0 => '0');
+        result <= (32 downto 0 => '0');
+
     end case;
-  END PROCESS;
 
-  OUTPUT <= RESULT(31 downto 0);
-  CARRYOUT <= RESULT(32);
+  end process;
 
-  Z <= '1' when RESULT(31 downto 0) = (31 downto 0 => '0') else '0';
-  N <= RESULT(31);
+  OUTPUT   <= result(31 downto 0);
+  CARRYOUT <= result(32);
+
+  Z <= '1' when result(31 downto 0) = (31 downto 0 => '0') else
+       '0';
+  N <= result(31);
   -- OV = Sign A ^ Sign B ^ Carry ^ Sign Result
-  OV  <= OPA(31) xor OPB(31) xor RESULT(32) xor RESULT(31);
-  OVW <= OPA(15) xor OPB(15) xor RESULT(16) xor RESULT(15);
-  OVB <= OPA(7) xor OPB(7) xor RESULT(8) xor RESULT(7);
+  OV  <= OPA(31) xor OPB(31) xor result(32) xor result(31);
+  OVW <= OPA(15) xor OPB(15) xor result(16) xor result(15);
+  OVB <= OPA(7) xor OPB(7) xor result(8) xor result(7);
 
-
-END Behavioral;
+end architecture BEHAVIORAL;
