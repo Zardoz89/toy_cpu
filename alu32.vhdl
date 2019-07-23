@@ -32,6 +32,23 @@ architecture BEHAVIORAL of ALU is
   -- We use one extra bit to get free the carry bit
   signal result : std_logic_vector(32 DOWNTO 0);
 
+  -- Contants
+  constant op_and  : std_logic_vector(3 downto 0) := x"0";
+  constant op_or   : std_logic_vector(3 downto 0) := x"1";
+  constant op_xor  : std_logic_vector(3 downto 0) := x"2";
+  constant op_bitc : std_logic_vector(3 downto 0) := x"3";
+  constant op_add  : std_logic_vector(3 downto 0) := x"4";
+  constant op_addc : std_logic_vector(3 downto 0) := x"5";
+  constant op_sub  : std_logic_vector(3 downto 0) := x"6";
+  constant op_subb : std_logic_vector(3 downto 0) := x"7";
+  constant op_rsb  : std_logic_vector(3 downto 0) := x"8";
+  constant op_rsbb : std_logic_vector(3 downto 0) := x"9";
+  constant op_lls  : std_logic_vector(3 downto 0) := x"A";
+  constant op_lrs  : std_logic_vector(3 downto 0) := x"B";
+  constant op_ars  : std_logic_vector(3 downto 0) := x"C";
+  constant op_rotl : std_logic_vector(3 downto 0) := x"D";
+  constant op_rotr : std_logic_vector(3 downto 0) := x"E";
+
 begin
 
   process (OPA, OPB, OPERATION) is
@@ -42,58 +59,58 @@ begin
 
     case OPERATION is
 
-      when x"0" =>          -- AND
+      when op_and =>           -- AND
         result <= ('0' & OPA) and ('0' & OPB);
-      when x"1" =>          -- OR
+      when op_or =>            -- OR
         result <= ('0' & OPA) or ('0' & OPB);
-      when x"2" =>          -- XOR
+      when op_xor =>           -- XOR
         result <= ('0' & OPA) xor ('0' & OPB);
-      when x"3" =>          -- BITC (and NOT OPB if OPA is full of 1's)
+      when op_bitc =>          -- BITC (and NOT OPB if OPA is full of 1's)
         result <= ('0' & OPA) and ('0' & not OPB);
-      when x"4" =>          -- ADD
+      when op_add =>           -- ADD
         result <= ('0' & OPA) + ('0' & OPB);
-      when x"5" =>          -- ADDC
+      when op_addc =>          -- ADDC
         result <= ('0' & OPA) + ('0' & OPB) + CARRYIN;
-      when x"6" =>          -- SUB
+      when op_sub =>           -- SUB
         result <= ('0' & OPA) + ('1' & not OPB) + '1';
-      when x"7" =>          -- SUBB
+      when op_subb =>          -- SUBB
         result <= ('0' & OPA) + not (('0' & OPB) + CARRYIN) + '1';
-      when x"8" =>          -- RSB
+      when op_rsb =>           -- RSB
         result <= ('0' & OPB) + ('1' & not OPA) + '1';
-      when x"9" =>          -- RSBB
+      when op_rsbb =>          -- RSBB
         result <= ('0' & OPB) + not (('0' & OPA) + CARRYIN) + '1';
 
-      when x"A" =>          -- LLS
+      when op_lls =>           -- LLS
         shift := to_integer(OPB(4 downto 0));
         result(31 downto 0) <= OPA(31 - shift downto 0) & (shift - 1 downto 0 => '0');
 
-        if (shift > 0) then -- Sets carry bit
+        if (shift > 0) then    -- Sets carry bit
           result(32) <= OPA(31 - shift + 1);
         else
           result(32) <= '0';
         end if;
 
-      when x"B" =>          -- LRS
+      when op_lrs =>           -- LRS
         shift := to_integer(OPB(4 downto 0));
         result(31 downto 0) <= (31 downto (32 - shift) => '0') & OPA(31 downto shift);
 
-        if (shift > 0) then -- Sets carry bit
+        if (shift > 0) then    -- Sets carry bit
           result(32) <= OPA(shift - 1);
         else
           result(32) <= '0';
         end if;
 
-      when x"C" =>          -- ARS
+      when op_ars =>           -- ARS
         shift := to_integer(OPB(4 downto 0));
         result(31 downto 0) <= (31 downto (32 - shift) => OPA(31)) & OPA(31 downto shift);
 
-        if (shift > 0) then -- Sets carry bit
+        if (shift > 0) then    -- Sets carry bit
           result(32) <= OPA(shift - 1);
         else
           result(32) <= '0';
         end if;
 
-      when x"D" =>          -- ROTL
+      when op_rotl =>          -- ROTL
         result(32) <= '0';
         shift := to_integer(OPB(4 downto 0));
 
@@ -103,7 +120,7 @@ begin
           result(31 downto 0) <= OPA;
         end if;
 
-      when x"E" =>          -- ROTR
+      when op_rotr =>          -- ROTR
         result(32) <= '0';
         shift := to_integer(OPB(4 downto 0));
 
