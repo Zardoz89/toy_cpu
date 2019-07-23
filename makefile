@@ -11,6 +11,8 @@ WORKDIR = work
 SIMDIR = sim
 WAVEFORM_VIEWER = gtkwave
 
+CODE_STYLER = vsg
+
 MODULES=\
 	umul.vhdl \
 	umul_tb.vhdl \
@@ -23,7 +25,7 @@ MODULES=\
 	i_memory.vhdl
 
 
-.PHONY: clean
+.PHONY: all clean style
 
 all : clean umul_wave alu_wave reg_file_wave toy_cpu_wave
 
@@ -63,6 +65,10 @@ run:
 
 view:
 	@gunzip --stdout $(SIMDIR)/$(TESTBENCHFILE).vcdgz | $(WAVEFORM_VIEWER) --vcd
+
+# Enforce code style
+style: $(MODULES)
+	$(CODE_STYLER) --fix -f $^
 
 clean:
 	@rm -rf $(SIMDIR)
