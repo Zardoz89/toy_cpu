@@ -168,6 +168,25 @@ begin
       report "BEBA_CAGEx27BE_10A5 must be 1D9C_0FF5_F598_B5B6 !"
       severity failure;
 
+    -- Test FFFF_FFFFxFFFF_FFFF == FFFF_FFFE_0000_0001
+    wait for clk_period;
+    opa   <= X"FFFF_FFFF";
+    opb   <= X"FFFF_FFFF";
+    start <= '1';
+    wait for clk_period;
+    start <= '0';
+
+    assert finish = '0'
+      report "finish signal isn't togle to false before finishing calculation"
+      severity failure;
+
+    wait until finish'event AND finish ='1';
+
+    assert output_lsb = x"0000_0001" AND output_msb = x"FFFF_FFFE"
+      report "FFFF_FFFFxFFFF_FFFF must be FFFF_FFFE_0000_0001 !"
+      severity failure;
+
+    -- Finish test
     end_simulation <= true;
     assert false
       report "Test done. Open EPWave to see signals."

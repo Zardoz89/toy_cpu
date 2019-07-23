@@ -1,4 +1,6 @@
 -- 32 bit naive unsigned multiplicator
+-- Does a 32x32bit to 64 bit output using clasic long multiplication
+-- Number of clock cycles is fixed for any nyumber with this method
 -- Created by Luis Panadero Guardeño
 -- MIT License
 
@@ -11,13 +13,13 @@ library IEEE;
 
 entity UMUL is
   port (
-    CLK        : in    std_logic;
-    START      : in    std_logic;
-    OPA        : in    std_logic_vector(31 downto 0);
-    OPB        : in    std_logic_vector(31 downto 0);
-    OUTPUT_LSB : out   std_logic_vector(31 downto 0);
-    OUTPUT_MSB : out   std_logic_vector(31 downto 0);
-    FINISH     : out   std_logic
+    CLK        : in    std_logic;                     -- CPU clock
+    START      : in    std_logic;                     -- Start multiplication os OPA x OPB
+    OPA        : in    std_logic_vector(31 downto 0); -- Operator A
+    OPB        : in    std_logic_vector(31 downto 0); -- Operator B
+    OUTPUT_LSB : out   std_logic_vector(31 downto 0); -- Lower 32 bits of the output
+    OUTPUT_MSB : out   std_logic_vector(31 downto 0); -- Highest 32 bits of the output
+    FINISH     : out   std_logic                      -- Set to high to indicate when the multiplication has finished
   );
 end entity UMUL;
 
@@ -25,16 +27,18 @@ end entity UMUL;
 
 architecture UMUL_ARCH of UMUL is
 
-  signal enabled      : std_logic;
+  signal enabled      : std_logic; -- Internal control of is doing a multiplication
   signal multiplicand : std_logic_vector(63 downto 0);
   signal multiplier   : std_logic_vector(63 downto 0);
   signal acumulator   : std_logic_vector(63 downto 0);
 
 begin
 
+  -- Multiplication process
+  -- Start the multiplication when start is togle high
   MULTIPLICATOR : process (start, clk) is
 
-    variable counter : integer range 0 to 32;
+    variable counter : integer range 0 to 32; -- Count binary digit
 
   begin
 
