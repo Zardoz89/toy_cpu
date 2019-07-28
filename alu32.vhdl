@@ -36,18 +36,18 @@ architecture BEHAVIORAL of ALU is
   constant op_and  : std_logic_vector(3 downto 0) := x"0";
   constant op_or   : std_logic_vector(3 downto 0) := x"1";
   constant op_xor  : std_logic_vector(3 downto 0) := x"2";
-  constant op_bitc : std_logic_vector(3 downto 0) := x"3";
+  constant op_bitc : std_logic_vector(3 downto 0) := x"3"; -- Bit Clear (A AND NOT B)
   constant op_add  : std_logic_vector(3 downto 0) := x"4";
   constant op_addc : std_logic_vector(3 downto 0) := x"5";
   constant op_sub  : std_logic_vector(3 downto 0) := x"6";
   constant op_subb : std_logic_vector(3 downto 0) := x"7";
   constant op_rsb  : std_logic_vector(3 downto 0) := x"8";
   constant op_rsbb : std_logic_vector(3 downto 0) := x"9";
-  constant op_lls  : std_logic_vector(3 downto 0) := x"A";
-  constant op_lrs  : std_logic_vector(3 downto 0) := x"B";
-  constant op_ars  : std_logic_vector(3 downto 0) := x"C";
-  constant op_rotl : std_logic_vector(3 downto 0) := x"D";
-  constant op_rotr : std_logic_vector(3 downto 0) := x"E";
+  constant op_lls  : std_logic_vector(3 downto 0) := x"A"; -- Logical Left Shift
+  constant op_lrs  : std_logic_vector(3 downto 0) := x"B"; -- Logical Rigth Shift
+  constant op_ars  : std_logic_vector(3 downto 0) := x"C"; -- Arithmetic Right Shift
+  constant op_rotl : std_logic_vector(3 downto 0) := x"D"; -- Rotate Left
+  constant op_rotr : std_logic_vector(3 downto 0) := x"E"; -- Rotate Rigth
 
 begin
 

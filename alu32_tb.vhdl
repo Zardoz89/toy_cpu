@@ -250,15 +250,15 @@ begin
       severity failure;
 
     -- AND
-    dataa <= x"5555_AAAA";
-    datab <= x"AAAA_5555";
+    dataa <= x"555F_AFAA";
+    datab <= x"AAAA_F555";
     cin   <= '0';
     op    <= op_and;
     wait for delayt;
-    assert dataout=x"0000_0000"
+    assert dataout=x"000A_A500"
       report "AND failed - Value"
       severity failure;
-    assert z='1' and n='0' and cout='0'
+    assert z='0' and n='0' and cout='0'
       report "AND failed - Flags"
       severity failure;
 
@@ -302,19 +302,6 @@ begin
       severity failure;
 
     -- LLS
-    dataa <= x"5000_000A";
-    datab <= x"0000_0002";
-    cin   <= '0';
-    op    <= op_lls;
-    wait for delayt;
-    assert dataout=x"4000_0028"
-      report "LLS failed - Value"
-      severity failure;
-    assert z='0' and n='0' and cout='1'
-      report "LLS failed - Flags"
-      severity failure;
-
-    -- LLS
     dataa <= x"F000_0001";
     datab <= x"0000_0001";
     cin   <= '0';
@@ -327,82 +314,162 @@ begin
       report "LLS failed - Flags"
       severity failure;
 
-    -- TODO do this tests
-    dataa <= x"5000000A";
-    datab <= x"0FFFFFFF";
+    -- LLS
+    dataa <= x"5000_000A";
+    datab <= x"0000_0002";
     cin   <= '0';
     op    <= op_lls;
     wait for delayt;
+    assert dataout=x"4000_0028"
+      report "LLS failed - Value"
+      severity failure;
+    assert z='0' and n='0' and cout='1'
+      report "LLS failed - Flags"
+      severity failure;
+
+    -- LLS only uses LSB 4 bits of opb -> max 31 bits of shift
+    dataa <= x"5000_000F";
+    datab <= x"0000_00FF";
+    cin   <= '0';
+    op    <= op_lls;
+    wait for delayt;
+    assert dataout=x"8000_0000"
+      report "LLS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='1' and cout='1'
+      report "LLS failed - Flags"
+      severity failure;
 
     -- LRS
-    dataa <= x"5000000A";
-    datab <= x"00000002";
+    dataa <= x"5000_000A";
+    datab <= x"0000_0001";
     cin   <= '0';
     op    <= op_lrs;
     wait for delayt;
+    assert dataout=x"2800_0005"
+      report "LRS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='0' and cout='0'
+      report "LRS failed - Flags"
+      severity failure;
+
+    -- LRS
+    dataa <= x"5000_000A";
+    datab <= x"0000_0002";
+    cin   <= '0';
+    op    <= op_lrs;
+    wait for delayt;
+    assert dataout=x"1400_0002"
+      report "LRS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='0' and cout='1'
+      report "LRS failed - Flags"
+      severity failure;
+
+    -- LRS only uses LSB 4 bits of opb -> max 31 bits of shift
+    dataa <= x"D000_000A";
+    datab <= x"0000_00FF";
+    cin   <= '0';
+    op    <= op_lrs;
+    wait for delayt;
+    assert dataout=x"0000_0001"
+      report "LRS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='0' and cout='1'
+      report "LRS failed - Flags"
+      severity failure;
 
     -- ARS
-    dataa <= x"A0000005";
-    datab <= x"00000002";
+    dataa <= x"A000_0005";
+    datab <= x"0000_000F";
     cin   <= '0';
     op    <= op_ars;
     wait for delayt;
+    assert dataout=x"FFFF_4000"
+      report "ARS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='1' and cout='0'
+      report "ARS failed - Flags"
+      severity failure;
+
+    -- ARS
+    dataa <= x"2000_0005";
+    datab <= x"0000_000F";
+    cin   <= '0';
+    op    <= op_ars;
+    wait for delayt;
+    assert dataout=x"0000_4000"
+      report "ARS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='0' and cout='0'
+      report "ARS failed - Flags"
+      severity failure;
+
+    -- ARS only uses LSB 4 bits of opb -> max 31 bits of shift
+    dataa <= x"F000_0005";
+    datab <= x"0000_00FF";
+    cin   <= '0';
+    op    <= op_ars;
+    wait for delayt;
+    assert dataout=x"FFFF_FFFF"
+      report "ARS failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='1' and cout='1'
+      report "ARS failed - Flags"
+      severity failure;
 
     -- ROTL
-    dataa <= x"F000005A";
-    datab <= x"00000001";
+    dataa <= x"F000_005A";
+    datab <= x"0000_0004";
     cin   <= '0';
     op    <= op_rotl;
     wait for delayt;
+    assert dataout=x"0000_05AF"
+      report "ROTL failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='0' and cout='0'
+      report "ROTL failed - Flags"
+      severity failure;
 
-    -- ROTL
-    dataa <= x"F000005A";
-    datab <= x"00000004";
+    -- ROTL only uses LSB 4 bits of opb -> max 31 bits of shift
+    dataa <= x"F000_005A";
+    datab <= x"0000_00FF";
     cin   <= '0';
     op    <= op_rotl;
     wait for delayt;
-
-    -- ROTL
-    dataa <= x"F000005A";
-    datab <= x"0000009C";
-    cin   <= '0';
-    op    <= op_rotl;
-    wait for delayt;
-
-    -- ROTL
-    dataa <= x"F000005A";
-    datab <= x"00000020";
-    cin   <= '0';
-    op    <= op_rotl;
-    wait for delayt;
+    assert dataout=x"7800_002D"
+      report "ROTL failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='0' and cout='0'
+      report "ROTL failed - Flags"
+      severity failure;
 
     -- ROTR
-    dataa <= x"F000005A";
-    datab <= x"00000001";
+    dataa <= x"F000_005A";
+    datab <= x"0000_0004";
     cin   <= '0';
     op    <= op_rotr;
     wait for delayt;
+    assert dataout=x"AF00_0005"
+      report "ROTR failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='1' and cout='0'
+      report "ROTR failed - Flags"
+      severity failure;
 
-    -- ROTR
-    dataa <= x"F000005A";
-    datab <= x"00000004";
+    -- ROTR only uses LSB 4 bits of opb -> max 31 bits of shift
+    dataa <= x"F000_005A";
+    datab <= x"0000_00FF";
     cin   <= '0';
     op    <= op_rotr;
     wait for delayt;
+    assert dataout=x"E000_00B5"
+      report "ROTR failed - Value 0x" & to_hstring(dataout)
+      severity failure;
+    assert z='0' and n='1' and cout='0'
+      report "ROTR failed - Flags"
+      severity failure;
 
-    -- ROTR
-    dataa <= x"F000005A";
-    datab <= x"0000009C";
-    cin   <= '0';
-    op    <= op_rotr;
-    wait for delayt;
-
-    -- ROTR
-    dataa <= x"F000005A";
-    datab <= x"00000020";
-    cin   <= '0';
-    op    <= op_rotr;
-    wait for delayt;
 
     assert false
       report "Test done. Open EPWave to see signals."
