@@ -70,7 +70,7 @@ architecture BEHAVIORAL of REG_FILE_TB is
     );
   end component;
 
-  constant clk_period : time := 10 ns;
+  constant clk_period : time := 100 ns; -- 10Mhz
   signal end_simulation : boolean := false;
 
 begin
@@ -159,6 +159,35 @@ begin
         report "Read via r3out failed"
         severity failure;
     end loop;
+
+    -- Flags register in/out
+    wait for clk_period;
+    fin <= x"BEBA_CAFE";
+    wf <= '1';
+    assert fout=x"0000_00F0"
+      report "Read flags dualport behaviur failed. - Value 0x" & to_hstring(fout)
+      severity failure;
+    wait for clk_period;
+    assert fout=x"BEBA_CAFE"
+      report "Read flags failed or failed to write new value. - Value 0x" & to_hstring(fout)
+      severity failure;
+
+    -- Stack register in/out
+    wait for clk_period;
+    spin <= x"BEEF_ABCD";
+    wsp <= '1';
+    assert spout=x"0000_00D0"
+      report "Read stack dualport behaviur failed. - Value 0x" & to_hstring(spout)
+      severity failure;
+    wait for clk_period;
+    assert spout=x"BEEF_ABCD"
+      report "Read stask failed or failed to write new value. - Value 0x" & to_hstring(spout)
+      severity failure;
+
+    -- IA register out
+    assert iaout=x"0000_00E0"
+      report "Read IA failed. - Value 0x" & to_hstring(iaout)
+      severity failure;
 
     wait for clk_period;
     end_simulation <= true;

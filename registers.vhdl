@@ -60,16 +60,24 @@ begin
       for i in 0 to 15 loop
         registers(i) <= (others => '0');
       end loop;
-    elsif (WF = '1' AND rising_EDGE (CLK)) then
-      -- Overwrite Flag register
-      registers(flags) <= FIN;
-    elsif (WSP = '1' AND rising_EDGE (CLK)) then
-      -- Overwrite Stack register
-      registers(sp) <= FIN;
-    elsif (WE1 = '1' AND rising_EDGE (CLK)) then
-      registers(to_integer(R1_SEL)) <= DATAIN1;
-    elsif (WE2 = '1' AND rising_EDGE (CLK)) then
-      registers(to_integer(R2_SEL)) <= DATAIN2;
+    elsif (rising_EDGE (CLK)) then
+      if (WE1 = '1' OR WE2 = '1') then
+        if (WE1 = '1') then
+          registers(to_integer(R1_SEL)) <= DATAIN1;
+        end if;
+        if (WE2 = '1') then
+          registers(to_integer(R2_SEL)) <= DATAIN2;
+        end if;
+      else
+        if (WF = '1') then
+          -- Overwrite Flag register
+          registers(flags) <= FIN;
+        end if;
+        if (WSP = '1') then
+          -- Overwrite Stack register
+          registers(sp) <= SPIN;
+        end if;
+      end if;
     end if;
 
   end process;
