@@ -14,9 +14,9 @@ entity ALU is
     OPA       : in    std_logic_vector(31 DOWNTO 0);
     OPB       : in    std_logic_vector(31 DOWNTO 0);
     OPERATION : in    std_logic_vector(3 DOWNTO 0);
-    CARRYIN   : in    STD_LOGIC;        -- Old carry
+    CARRYIN   : in    STD_LOGIC;        -- Carry in
     OUTPUT    : out   std_logic_vector(31 DOWNTO 0);
-    CARRYOUT  : out   STD_LOGIC;        -- Carry
+    CARRYOUT  : out   STD_LOGIC;        -- Carry out
     OV        : out   STD_LOGIC;        -- Overflow 32 bit
     OVW       : out   STD_LOGIC;        -- Overflow 16 bit
     OVB       : out   STD_LOGIC;        -- Overflow 8 bit

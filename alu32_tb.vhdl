@@ -16,13 +16,13 @@ architecture BEHAVIORAL of ALU_TB is
   signal datab   : std_logic_vector(31 downto 0) := X"00000000";
   signal op      : std_logic_vector(3 downto 0) := X"0";
   signal dataout : std_logic_vector(31 downto 0);
-  signal cin     : std_logic := '0';
-  signal cout    : std_logic;
-  signal ov      : std_logic;
-  signal ovw     : std_logic;
-  signal ovb     : std_logic;
-  signal z       : std_logic;
-  signal n       : std_logic;
+  signal cin     : std_logic := '0'; -- Carry in
+  signal cout    : std_logic; -- Carry out
+  signal ov      : std_logic; -- Overflow 32 bit
+  signal ovw     : std_logic; -- Overflow 16 bit
+  signal ovb     : std_logic; -- Overflow 8 bit
+  signal z       : std_logic; -- Zero flag
+  signal n       : std_logic; -- Negative flag
 
   -- DUT component
 

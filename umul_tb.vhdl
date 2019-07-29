@@ -47,7 +47,7 @@ begin
   UUT : UMUL
     generic map (
       BITS => 32
-  )
+    )
     port map (clk, start, opa, opb, output_lsb, output_msb, finish);
 
   CLK_PROCESS : process
