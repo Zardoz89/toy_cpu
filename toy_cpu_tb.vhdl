@@ -72,7 +72,7 @@ begin
   -- Connect Instrucction RAM
   INST_MEM_INSTR : MEMORIA
     generic map (
-      C_FILENAME      => "program",
+      C_FILENAME      => "program.lst",
       C_MEM_SIZE      => 1024,
       C_LITTLE_ENDIAN => false
       ) port map (

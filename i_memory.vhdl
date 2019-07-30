@@ -40,6 +40,7 @@ begin
     variable datum        : std_logic_vector(31 downto 0);
     file     TEXTFILE     : text; -- is in C_FILENAME;
     variable current_line : line;
+    variable good         : boolean;
 
   begin
 
@@ -53,23 +54,33 @@ begin
       file_open(TEXTFILE, C_FILENAME, read_mode);
       while (not endfile (TEXTFILE)) loop
         readline (TEXTFILE, current_line);
-        hread(current_line, address);
-        hread(current_line, datum);
-        assert to_integer(address(31 downto 0))<C_MEM_SIZE
-          report "Direccion fuera de rango en el fichero de la memoria. -" & to_hstring(address)
-          severity failure;
-        --report "0x" & to_hstring(address) & "-> 0x" & to_hstring(datum)
-        --  severity note;
-        if (C_LITTLE_ENDIAN) then
-          ram(to_integer(address(31 downto 0)))       <= datum(31 downto 24);
-          ram(to_integer(address(31 downto 0) +'1'))  <= datum(23 downto 16);
-          ram(to_integer(address(31 downto 0) +"10")) <= datum(15 downto 8);
-          ram(to_integer(address(31 downto 0) +"11")) <= datum(7 downto 0);
-        else
-          ram(to_integer(address(31 downto 0)))       <= datum(7 downto 0);
-          ram(to_integer(address(31 downto 0) +'1'))  <= datum(15 downto 8);
-          ram(to_integer(address(31 downto 0) +"10")) <= datum(23 downto 16);
-          ram(to_integer(address(31 downto 0) +"11")) <= datum(31 downto 24);
+        if (current_line'length > 0 and current_line.all(1) /= '#') then
+          hread(current_line, address, good);
+          if (not good) then
+            report "Invalid value. Expected a hexadecimal value for address. -" & current_line.all
+            severity failure;
+          end if;
+          hread(current_line, datum, good);
+          if (not good) then
+            report "Invalid value. Expected a hexadecimal value for binary data. -" & current_line.all
+            severity failure;
+          end if;
+          assert to_integer(address(31 downto 0))<C_MEM_SIZE
+            report "Address out of memory range. 0x" & to_hstring(address)
+            severity failure;
+          --report "0x" & to_hstring(address) & "-> 0x" & to_hstring(datum)
+          --  severity note;
+          if (C_LITTLE_ENDIAN) then
+            ram(to_integer(address(31 downto 0)))       <= datum(31 downto 24);
+            ram(to_integer(address(31 downto 0) +'1'))  <= datum(23 downto 16);
+            ram(to_integer(address(31 downto 0) +"10")) <= datum(15 downto 8);
+            ram(to_integer(address(31 downto 0) +"11")) <= datum(7 downto 0);
+          else
+            ram(to_integer(address(31 downto 0)))       <= datum(7 downto 0);
+            ram(to_integer(address(31 downto 0) +'1'))  <= datum(15 downto 8);
+            ram(to_integer(address(31 downto 0) +"10")) <= datum(23 downto 16);
+            ram(to_integer(address(31 downto 0) +"11")) <= datum(31 downto 24);
+          end if;
         end if;
       end loop;
 
