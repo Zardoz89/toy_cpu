@@ -1,0 +1,6 @@
+name "zasm"
+description "Zero ASeMbler. Dumb, minmal assembler for toy cpu."
+authors "Luis Panadero Guardeño"
+copyright "Copyright © 2019, Luis Panadero Guardeño"
+license "MIT"
+dependency "pegged" version="~>0.4.4"
