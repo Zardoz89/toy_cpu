@@ -30,25 +30,25 @@ MODULES=\
 all : clean umul_wave alu_wave reg_file_wave toy_cpu_wave
 
 umul_wave: umul_tb
-	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --wave=$<.ghw
 
 umul_tb: init
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 alu_wave: alu_tb
-	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --wave=$<.ghw
 
 alu_tb: init
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 reg_file_wave: reg_file_tb
-	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --wave=$<.ghw
 
 reg_file_tb: init
 	$(GHDL) -e $(GHDLFLAGS) $@
 
 toy_cpu_wave: toy_cpu_tb
-	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --vcd=$<.vcd
+	$(GHDL) -r $(GHDLFLAGS) $< $(GHDLRUNFLAGS) --wave=$<.ghw
 
 toy_cpu_tb: init
 	$(GHDL) -e $(GHDLFLAGS) $@
@@ -61,10 +61,10 @@ init: $(MODULES)
 
 
 run:
-	@$(SIMDIR)/$(TESTBENCHFILE) $(GHDL_SIM_OPT) --vcdgz=$(SIMDIR)/$(TESTBENCHFILE).vcdgz
+	@$(SIMDIR)/$(TESTBENCHFILE) $(GHDL_SIM_OPT) --wave=$(SIMDIR)/$(TESTBENCHFILE).ghw
 
 view:
-	@gunzip --stdout $(SIMDIR)/$(TESTBENCHFILE).vcdgz | $(WAVEFORM_VIEWER) --vcd
+	@gunzip --stdout $(SIMDIR)/$(TESTBENCHFILE).ghwgz | $(WAVEFORM_VIEWER) --wave
 
 # Enforce code style
 style: $(MODULES)
