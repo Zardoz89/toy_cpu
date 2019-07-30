@@ -26,7 +26,7 @@ end entity MEMORIA;
 
 architecture BEHAVIORAL of MEMORIA is
 
-  type matriz is array(0 to C_MEM_SIZE - 1) of STD_LOGIC_VECTOR(7 downto 0);
+  type matriz is array(C_MEM_SIZE - 1 downto 0) of STD_LOGIC_VECTOR(7 downto 0);
 
   signal ram : matriz;
   signal aux : std_logic_vector(31 downto 0):= (others=>'0');
@@ -55,23 +55,25 @@ begin
         readline (TEXTFILE, current_line);
         hread(current_line, address);
         hread(current_line, datum);
-        assert to_integer(address(30 downto 0))<C_MEM_SIZE
-          report "Direccion fuera de rango en el fichero de la memoria"
+        assert to_integer(address(31 downto 0))<C_MEM_SIZE
+          report "Direccion fuera de rango en el fichero de la memoria. -" & to_hstring(address)
           severity failure;
+        --report "0x" & to_hstring(address) & "-> 0x" & to_hstring(datum)
+        --  severity note;
         if (C_LITTLE_ENDIAN) then
-          ram(to_integer(address(30 downto 0)))       <= datum(31 downto 24);
-          ram(to_integer(address(30 downto 0) +'1'))  <= datum(23 downto 16);
-          ram(to_integer(address(30 downto 0) +"10")) <= datum(15 downto 8);
-          ram(to_integer(address(30 downto 0) +"11")) <= datum(7 downto 0);
+          ram(to_integer(address(31 downto 0)))       <= datum(31 downto 24);
+          ram(to_integer(address(31 downto 0) +'1'))  <= datum(23 downto 16);
+          ram(to_integer(address(31 downto 0) +"10")) <= datum(15 downto 8);
+          ram(to_integer(address(31 downto 0) +"11")) <= datum(7 downto 0);
         else
-          ram(to_integer(address(30 downto 0)))       <= datum(7 downto 0);
-          ram(to_integer(address(30 downto 0) +'1'))  <= datum(15 downto 8);
-          ram(to_integer(address(30 downto 0) +"10")) <= datum(23 downto 16);
-          ram(to_integer(address(30 downto 0) +"11")) <= datum(31 downto 24);
+          ram(to_integer(address(31 downto 0)))       <= datum(7 downto 0);
+          ram(to_integer(address(31 downto 0) +'1'))  <= datum(15 downto 8);
+          ram(to_integer(address(31 downto 0) +"10")) <= datum(23 downto 16);
+          ram(to_integer(address(31 downto 0) +"11")) <= datum(31 downto 24);
         end if;
       end loop;
 
-      -- por ultimo cerramos el archivo y actualizamos el flag de RAMria cargada
+      ---- por ultimo cerramos el archivo y actualizamos el flag de RAMria cargada
       file_close (TEXTFILE);
       aux <= X"0000_0000";
       load := false;
@@ -79,15 +81,15 @@ begin
       aux <= X"0000_0000";
     elsif (CLK'event and CLK = '1') then
       if (WR = '1') then
-        ram(to_integer(Addr(30 downto 0)))       <= DATAI(31 downto 24);
-        ram(to_integer(Addr(30 downto 0) +'1'))  <= DATAI(23 downto 16);
-        ram(to_integer(Addr(30 downto 0) +"10")) <= DATAI(15 downto 8);
-        ram(to_integer(Addr(30 downto 0) +"11")) <= DATAI(7 downto 0);
+        ram(to_integer(Addr(31 downto 0)))       <= DATAI(31 downto 24);
+        ram(to_integer(Addr(31 downto 0) +'1'))  <= DATAI(23 downto 16);
+        ram(to_integer(Addr(31 downto 0) +"10")) <= DATAI(15 downto 8);
+        ram(to_integer(Addr(31 downto 0) +"11")) <= DATAI(7 downto 0);
       else
-        aux(31 downto 24) <= ram(to_integer(ADDR(30 downto 0)));
-        aux(23 downto 16) <= ram(to_integer(ADDR(30 downto 0) +'1'));
-        aux(15 downto 8)  <= ram(to_integer(ADDR(30 downto 0) +"10"));
-        aux(7 downto 0)   <= ram(to_integer(ADDR(30 downto 0) +"11"));
+        aux(31 downto 24) <= ram(to_integer(ADDR(31 downto 0)));
+        aux(23 downto 16) <= ram(to_integer(ADDR(31 downto 0) +'1'));
+        aux(15 downto 8)  <= ram(to_integer(ADDR(31 downto 0) +"10"));
+        aux(7 downto 0)   <= ram(to_integer(ADDR(31 downto 0) +"11"));
       end if;
     end if;
 
