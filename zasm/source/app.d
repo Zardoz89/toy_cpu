@@ -54,6 +54,10 @@ void main()
     `;
 
   enum match = Assembly(input);
-
+  
+  writeln("*****");
+  writeln(input);
+  writeln("*****");
   writeln(match);
+  writeln("*****");
 }
